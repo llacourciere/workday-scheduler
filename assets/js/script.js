@@ -1,17 +1,27 @@
+var store = [];
 
-let store;
-
-const loadStorage = async ()=>{
-    if(localStorage.hours){
-        let store = await eval(localStorage.hours);
-        
-        store.forEach((ms, i) => {
-            $('textarea').eq(i).val(ms);
-        });
-    }
+var saveAppt = function () {
+    localStorage.setItem("store", JSON.stringify(store))
 };
 
-loadStorage();
+var loadAppt = function () {
+    store = JSON.parse(localStorage.getItem("store"));
+
+    // if nothing in localStorage, create a new object to track all task status arrays
+    if (!store) {
+        return false;
+    }
+    console.log('No appts found');
+    // loop over object properties
+    $.each(store, function (list, arr) {
+        console.log(list, arr);
+        // then loop over sub-array
+        arr.forEach((ms, i) => {
+            $('textarea').eq(i).val(ms);
+
+        });
+    });
+};
 //show date and time at top of page
 
 var date = document.querySelector('#currentDay')
@@ -29,7 +39,7 @@ hours.forEach((hour, i) => {
             <div class='col-md-1 hour'>
                 ${hour}
             </div>
-            <textarea class='col-md-10 ${rHour < cHour ? "past": rHour > cHour ? "future": "present"}'></textarea>
+            <textarea class='col-md-10 ${rHour < cHour ? "past" : rHour > cHour ? "future" : "present"}'></textarea>
             <div class='col-md-1 saveBtn'>
             <i class="far fa-save"></i>
             </div>
@@ -38,14 +48,13 @@ hours.forEach((hour, i) => {
     `;
 });
 
-const handleClick = ()=> {
-    store = [];
+const handleClick = () => {
 
     for (let i = 0; i < $("textarea").length; i++) {
         store.push($('textarea').eq(i).val())
+        saveAppt();
     };
-
-    localStorage.hours = JSON.stringify(store);
 };
 
-document.querySelector('.saveBtn').addEventListener('click',handleClick);
+document.querySelector('.saveBtn').addEventListener('click', handleClick);
+loadAppt();
